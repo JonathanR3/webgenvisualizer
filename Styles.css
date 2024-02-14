@@ -1,0 +1,58 @@
+body {
+    background-color: beige;
+}
+
+path {
+    fill: burlywood;
+}
+
+path:hover {
+    fill: lightcoral !important;
+    stroke: darkred;
+    stroke-width: 5px;
+    transition: fill 0.4s;
+    
+}
+
+.map {
+    display: flex;
+    justify-content: center;
+}
+
+.header {
+    margin: auto;
+    text-align: center;
+    position: relative;
+    color:brown;
+    font-size: 30px;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+hr.solid {
+    border-top: 3px solid black;
+}
+
+#tooltip {
+    position: absolute;
+    color: darkkhaki;
+    font-weight: bold;
+    font-size: 50px;
+    margin: auto;
+}
+
+li {
+    list-style: none;
+}
+
+.each-hospital {
+    color: seagreen;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+#hospital-list {
+    margin: auto;
+    justify-content: center;
+}
