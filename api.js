@@ -6,9 +6,10 @@ const individualHospitalURL = "https://www.communitybenefitinsight.org/api/get_h
 let hospitalID = "";
 let hospitalURL = "";
 let hospitalInfo;
+let dataChosen = "";
 
 let year = [];
-let revenue = [];
+let yearData = [];
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -62,10 +63,61 @@ function listHospitals() {
             console.log(hospitalID);
             hospitalURL = "https://corsproxy.io/?" + individualHospitalURL + hospitalID;
             console.log(hospitalURL);
-            fetchCurrentHospital();
+            chooseDimensions();
         })
         listContainer.appendChild(currentHospital);
     });
+}
+
+function chooseDimensions() {
+    let listContainer = document.getElementById("hospital-list");
+    listContainer.innerHTML = "";
+
+    let buttonCont = document.createElement("div");
+    buttonCont.id = "button-container";
+
+    let dropDownButton = document.createElement("button");
+    dropDownButton.textContent = "Choose Metric";
+    dropDownButton.classList.add("drop-down-button");
+
+    let dropDownContent = document.createElement("div");
+    dropDownContent.classList.add("drop-down-content");
+    dropDownContent.id = "myDropDown";
+
+    let choices = ["Total Functional Expenses", "Total Revenue", "Total Community Benefits", "Quartile of Percent Persons in Poverty"];
+    choices.forEach( (opt) => {
+        dropDownContent.appendChild(createList(opt));
+    })
+
+    dropDownButton.addEventListener("click", () => {
+        document.getElementById("myDropDown").classList.toggle("show-menu");
+    })
+
+    window.onclick = (event) => {
+        if (!event.target.matches(".drop-down-button")) {
+            let dropDown = document.getElementsByClassName("drop-down-content");
+            for (let i = 0; i < dropDown.length; i++) {
+                let openDropDown = dropDown[i];
+                if (openDropDown.classList.contains('show-menu')) {
+                    openDropDown.classList.remove('show-menu');
+                }
+            }
+        }
+    }
+    dropDownButton.appendChild(dropDownContent);
+    buttonCont.appendChild(dropDownButton);
+    listContainer.appendChild(buttonCont);
+}
+
+function createList(content) {
+    let option = document.createElement("a");
+    option.href = "#";
+    option.textContent = content;
+    option.addEventListener("click", () => {
+        dataChosen = content;
+        fetchCurrentHospital();
+    })
+    return option;
 }
 
 async function fetchCurrentHospital() {
@@ -87,17 +139,33 @@ async function fetchCurrentHospital() {
 function listRevenue() {
     let hospitalName = "";
     year = [];
-    revenue = [];
-    let listContainer = document.getElementById("hospital-list");
+    yearData = [];
+    let listContainer = document.getElementById("hospital-chart");
     listContainer.innerHTML = "";
-    hospitalInfo.forEach(id => {
+
+    hospitalInfo.forEach( (id) => {
         hospitalName = id.data_name;
         year.push( `${id.fiscal_yr}`);
-        revenue.push(`${id.tot_revenue}`);
+        switch (dataChosen) {
+            case "Total Functional Expenses":
+                yearData.push(`${id.tot_func_exp}`);
+                break;
+            case "Total Revenue":
+                yearData.push(`${id.tot_revenue}`);
+                break;
+            case "Total Community Benefits":
+                yearData.push(`${id.tot_comm_bnfts}`);
+                break;
+            case "Quartile of Percent Persons in Poverty":
+                yearData.push(`${id.percent_ppl_pov_qrt}`);
+                break;
+            default:
+                console.log("Something went wrong");
+        }
     });
     let plot = [{
         x: year,
-        y: revenue,
+        y: yearData,
         type: "bar",
         orientation:"v",
         marker: {
@@ -105,12 +173,11 @@ function listRevenue() {
         }
     }];
     let layout = {
-        title:"Total Revenue Every Fiscal Year at " + `${hospitalName}`,
-        plot_bgcolor: "lightgray",
-        paper_bgcolor: "#98AEB6"
+        title: dataChosen + " Every Fiscal Year at " + `${hospitalName}`,
+        plot_bgcolor: "#FFE4B5",
+        paper_bgcolor: "#8FBC8F"
     }
     Plotly.newPlot(listContainer, plot, layout);
 
 
 }
-
